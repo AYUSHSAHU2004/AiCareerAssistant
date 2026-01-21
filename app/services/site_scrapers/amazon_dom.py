@@ -1,6 +1,5 @@
 from typing import List
 from urllib.parse import urljoin
-
 from bs4 import BeautifulSoup
 from app.services.job_schema import JobDict
 from app.services.site_scrapers.base import BaseScraper
