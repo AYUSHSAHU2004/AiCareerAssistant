@@ -17,6 +17,7 @@ app.add_middleware(
 
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
 app.include_router(resumes.router, prefix="/api/v1/resumes", tags=["resumes"])
+app.include_router(jobs.router, prefix="/api/v1/jobs", tags=["jobs"])
 
 
 
