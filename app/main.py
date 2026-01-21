@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.api.v1 import users
+from app.api.v1 import users,resumes
 
 app = FastAPI(title=settings.APP_NAME)
 
@@ -16,6 +16,7 @@ app.add_middleware(
 
 
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
+app.include_router(resumes.router, prefix="/api/v1/resumes", tags=["resumes"])
 
 
 
