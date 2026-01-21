@@ -69,3 +69,21 @@ def rebuild_vector_store(db: Session) -> None:
 
 
 
+def load_vector_store() -> FAISS:
+    """
+    Load the FAISS index from disk (job_faiss_index directory),
+    caching it in memory for reuse.
+    """
+    global _STORE
+    if _STORE is not None:
+        return _STORE
+
+    if not os.path.exists(_INDEX_DIR):
+        raise FileNotFoundError(f"Vector store directory '{_INDEX_DIR}' not found.")
+
+    _STORE = FAISS.load_local(
+        _INDEX_DIR,
+        _embeddings,
+        allow_dangerous_deserialization=True,
+    )
+    return _STORE
