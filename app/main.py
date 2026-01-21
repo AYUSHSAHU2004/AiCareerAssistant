@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.api.v1 import users,resumes,jobs,jobs_admin,job_search
+from app.api.v1 import users,resumes,jobs,jobs_admin,job_search,resume_match
 
 app = FastAPI(title=settings.APP_NAME)
 
@@ -20,6 +20,7 @@ app.include_router(resumes.router, prefix="/api/v1/resumes", tags=["resumes"])
 app.include_router(jobs.router, prefix="/api/v1/jobs", tags=["jobs"])
 app.include_router(jobs_admin.router, prefix="/api/v1")
 app.include_router(job_search.router, prefix="/api/v1")
+app.include_router(resume_match.router, prefix="/api/v1")
 
 
 
