@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.api.v1 import users,referrals,resumes,jobs,jobs_admin,job_search,resume_match
+from app.api.v1 import users,referrals,resumes,jobs,jobs_admin,job_search,resume_match,rag
 
 app = FastAPI(title=settings.APP_NAME)
 
@@ -22,6 +22,7 @@ app.include_router(jobs_admin.router, prefix="/api/v1")
 app.include_router(job_search.router, prefix="/api/v1")
 app.include_router(resume_match.router, prefix="/api/v1")
 app.include_router(referrals.router, prefix="/api/v1")
+app.include_router(rag.router,prefix="/api/v1/rag",tags=["rag"])
 
 
 
