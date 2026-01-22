@@ -1,5 +1,6 @@
 import json
 from typing import List, Dict, Any
+from app.services.llm_client import call_llm
 
 
 def build_rerank_prompt(
@@ -33,6 +34,21 @@ Task:
 Respond ONLY in strict JSON like:
 {{"score": <number between 0 and 10>, "reason": "<short explanation>"}}
 """.strip()
+
+def parse_score_from_llm_output(output: str) -> Dict[str, Any]:
+    # Try to extract JSON block
+    start = output.find("{")
+    end = output.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        json_str = output[start : end + 1]
+        try:
+            obj = json.loads(json_str)
+            score = float(obj.get("score", 0))
+            reason = str(obj.get("reason", "")).strip()
+            return {"score": score, "reason": reason}
+        except Exception:
+            pass
+    return {"score": 0.0, "reason": "Failed to parse LLM output"}
 
 
 
