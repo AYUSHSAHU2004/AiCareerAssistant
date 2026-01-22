@@ -76,3 +76,16 @@ class Job(Base):
     __table_args__ = (
         UniqueConstraint("source_id", "external_job_id", name="uq_jobs_source_ext_id"),
     )
+
+
+class EmployeeReferralTarget(Base):
+    """Stores employee contacts for referral requests."""
+    __tablename__ = "employee_referral_targets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_name = Column(String(255), nullable=False, index=True)
+    employee_name = Column(String(255), nullable=False)
+    employee_email = Column(String(255), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
