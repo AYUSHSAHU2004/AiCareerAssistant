@@ -50,5 +50,33 @@ def parse_score_from_llm_output(output: str) -> Dict[str, Any]:
             pass
     return {"score": 0.0, "reason": "Failed to parse LLM output"}
 
+def rerank_jobs_with_llm(raw_resume_text: str, docs, top_n: int = 10) -> List[Dict[str, Any]]:
+    """
+    docs: list[Document] from FAISS (page_content, metadata with job_id, title, etc.)
+    """
+    candidate_profile = raw_resume_text
+    scored: List[Dict[str, Any]] = []
+    for d in docs:
+        job_title = d.metadata.get("title", "")
+        job_description = d.page_content
+
+        prompt = build_rerank_prompt(candidate_profile, job_title, job_description)
+        output = call_llm(prompt, max_new_tokens=128)
+        parsed = parse_score_from_llm_output(output)
+
+        scored.append(
+            {
+                "job_id": d.metadata.get("job_id"),
+                "doc": d,
+                "score": parsed["score"],
+                "reason": parsed["reason"],
+            }
+        )
+    
+    # Sort by score desc and filter low scores
+    scored.sort(key=lambda x: x["score"], reverse=True)
+    filtered = [s for s in scored if s["score"] >= 5.0]
+
+    return filtered[:top_n]
 
 
