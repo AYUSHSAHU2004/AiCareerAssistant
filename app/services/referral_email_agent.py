@@ -53,3 +53,15 @@ def generate_referral_email(
     output = call_llm(prompt, max_new_tokens=256)
     return output.strip()
 
+def extract_subject_body(email_text: str) -> tuple[str, str]:
+    """
+    If the first line starts with 'Subject:', split subject and body.
+    Otherwise, use a default subject and treat the whole text as body.
+    """
+    lines = email_text.splitlines()
+    if lines and lines[0].lower().startswith("subject:"):
+        subject = lines[0].split(":", 1)[1].strip()
+        body = "\n".join(lines[1:]).strip()
+        return subject, body
+    return "Referral request for software role", email_text.strip()
+
