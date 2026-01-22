@@ -3,8 +3,10 @@ from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter  # Assuming common splitter
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)  # Define globally or pass as param
-
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=200,
+)
 def load_youtube_documents(youtube_url: str):
     video_id = extract_video_id(youtube_url)
     try:
