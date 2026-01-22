@@ -38,3 +38,18 @@ Constraints:
 - Keep it 2–3 short paragraphs.
 - Do NOT add any JSON or extra explanation, only the email text.
 """.strip()
+
+
+def generate_referral_email(
+    candidate_resume: str,
+    job_title: str,
+    job_description: str,
+    employee_name: str,
+    company_name: str,
+) -> str:
+    prompt = build_referral_email_prompt(
+        candidate_resume, job_title, job_description, employee_name, company_name
+    )
+    output = call_llm(prompt, max_new_tokens=256)
+    return output.strip()
+
