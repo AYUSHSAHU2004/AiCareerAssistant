@@ -1,6 +1,5 @@
 const express = require('express');
 const EmailGroup = require('./models/EmailGroup');
-require('./db'); // connect to MongoDB
 
 const Queue = require('bull');
 const cors = require('cors');
