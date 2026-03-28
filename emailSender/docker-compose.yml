@@ -16,10 +16,8 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MONGO_URI=mongodb://mongo:27017/emailGroups
     depends_on:
       - redis
-      - mongo
     restart: unless-stopped
 
   worker:
@@ -28,8 +26,6 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MONGO_URI=mongodb://mongo:27017/emailGroups
     depends_on:
       - redis
-      - mongo
     restart: unless-stopped
