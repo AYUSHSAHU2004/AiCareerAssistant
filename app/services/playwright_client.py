@@ -1,8 +1,6 @@
 import asyncio
 from typing import Optional
 from playwright.async_api import async_playwright
-
-
 async def render_page_html(url: str, wait_selector: Optional[str] = None) -> str:
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -20,8 +18,5 @@ async def render_page_html(url: str, wait_selector: Optional[str] = None) -> str
         html = await page.content()
         await browser.close()
         return html
-
-
-
 def render_page_html_sync(url: str, wait_selector: Optional[str] = "div.job-tile") -> str:
     return asyncio.run(render_page_html(url, wait_selector))

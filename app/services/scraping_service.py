@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from app.services.playwright_client import render_page_html_sync
 
 
- def scrape_job_source_url(url: str) -> List[Dict[str, str]]:
+def scrape_job_source_url(url: str) -> List[Dict[str, str]]:
     """
     Scrape Amazon jobs page with Playwright and extract job details.
     """

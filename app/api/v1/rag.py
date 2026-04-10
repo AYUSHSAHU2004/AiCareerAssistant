@@ -2,17 +2,22 @@ from typing import List, Optional
 from fastapi import Form, File,APIRouter, Depends,HTTPException
 from pydantic import BaseModel
 from langchain_core.prompts import PromptTemplate
-
+from fastapi import UploadFile
 
 # Your service imports...
 from app.services.load_youtube_documents import load_youtube_documents
 from app.services.load_wikipedia_documents import load_wikipedia_documents
 from app.services.load_pdf_documents import load_pdf_documents
 from app.services.build_vector_store import build_vector_store
-from app.services.local_llm import call_llm
+from app.services.llm_client import call_llm
+
 
 
 router = APIRouter()
+
+class Source(BaseModel):
+    content: str
+    metadata: dict
 
 class RAGResponse(BaseModel):
     answer: str

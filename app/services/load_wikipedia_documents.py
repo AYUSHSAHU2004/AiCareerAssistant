@@ -1,4 +1,5 @@
 from langchain_community.document_loaders import WikipediaLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000,
