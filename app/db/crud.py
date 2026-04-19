@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.db import models
 from app.models.user import UserCreate
 from app.models.resume import ResumeCreate
+from app.models.job_source import JobSourceCreate,JobSourceRead
 
 
 
