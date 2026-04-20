@@ -28,23 +28,19 @@ def scrape_job_source(
     source_id: int,
     db: Session = Depends(get_db),
 ):
-    """
-    Fetch the stored job source URL, load it via LangChain WebBaseLoader,
-    and return some text snippets for inspection.
-    """
     source = db.query(models.JobSource).get(source_id)
+
     if not source:
         raise HTTPException(status_code=404, detail="Job source not found")
 
     try:
-        snippets = scrape_job_source_url(source.url)
+        snippets = scrape_job_source_url(source.base_url)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Scrape failed: {e}")
 
     return {
         "source_id": source.id,
-        "url": source.url,
+        "url": source.base_url,   # mapping here
         "snippet_count": len(snippets),
         "snippets": snippets,
     }
-

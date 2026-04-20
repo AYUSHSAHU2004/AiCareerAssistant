@@ -99,7 +99,7 @@ async def rag_endpoint(
         context=context_text,
         question=question,
     )
-
+    print(final_prompt)
     # ---------------------------
     # 4) CALL LOCAL LLM
     # ---------------------------

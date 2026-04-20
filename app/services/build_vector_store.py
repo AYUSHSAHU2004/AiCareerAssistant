@@ -1,5 +1,6 @@
 import os
 from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # Define a persistent directory for your vector store
 DB_FAISS_PATH = 'vectorstore/db_faiss'

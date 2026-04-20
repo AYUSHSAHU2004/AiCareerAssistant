@@ -19,8 +19,8 @@ def load_youtube_documents(youtube_url: str):
 
     docs = []
     for item in transcript_list:
-        start = item['start']  # Dict access, not attribute [web:11]
-        text = item['text']
+        start = item.start  # Dict access, not attribute [web:11]
+        text = item.text
         if not text.strip():
             continue
         docs.append(

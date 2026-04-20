@@ -31,7 +31,8 @@ def generate(req: GenerateRequest):
 def call_llm(prompt: str, max_new_tokens: int = 256) -> str:
     print("\n[LLM] Prompt preview:\n", prompt[:400], "...\n")
 
-    output = generate_text(prompt)
+    response = generate(GenerateRequest(prompt=prompt))
+    output = response.output
 
     print("[LLM] Output text preview:\n", output[:300], "...\n")
     return output
