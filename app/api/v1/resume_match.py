@@ -69,8 +69,8 @@ def match_jobs_for_user_resume(
 @router.get("/user/{user_id}/smart-matches")
 def smart_match_jobs_for_user_resume(
     user_id: int,
-    initial_k: int = Query(30, ge=5, le=100),  # how many from FAISS
-    top_n: int = Query(10, ge=1, le=30),       # how many after LLM rerank
+    initial_k: int = Query(2, ge=2, le=100),  # how many from FAISS
+    top_n: int = Query(1, ge=1, le=30),       # how many after LLM rerank
     db: Session = Depends(get_db),
 ):
     # 1) Latest resume
