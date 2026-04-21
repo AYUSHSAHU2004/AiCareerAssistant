@@ -4,10 +4,7 @@ venv/
 
 
 vectorstore/
-faiss_index/
-*.index
-*.pkl
-
+job_faiss_index/
 # Python cache
 __pycache__/
 *.pyc
