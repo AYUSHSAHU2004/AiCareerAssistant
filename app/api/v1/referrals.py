@@ -9,9 +9,8 @@ router = APIRouter(prefix="/referrals", tags=["referrals"])
 
 
 @router.post("/user/{user_id}/send-top3")
-def send_top3_referrals(user_id: int, db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+def send_top3(user_id: int, db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
     try:
-        results = send_top3_referral_emails_for_user(db, user_id)
+        return send_top3_referral_emails_for_user(db, user_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    return results

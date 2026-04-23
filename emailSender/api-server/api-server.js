@@ -1,5 +1,4 @@
 const express = require('express');
-const EmailGroup = require('./models/EmailGroup');
 
 const Queue = require('bull');
 const cors = require('cors');
