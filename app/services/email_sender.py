@@ -1,14 +1,15 @@
+import os
 import requests
 
 def queue_email(to: str, subject: str, text: str):
-    url = "http://localhost:3020/api/email"
+    url = os.getenv("NODE_API_URL")
 
     payload = {
         "to": to,
         "subject": subject,
         "text": text,
-        "emailUser": "your_email@gmail.com",   # move later to env
-        "emailPass": "your_app_password"
+        "emailUser": os.getenv("EMAIL_USER"),
+        "emailPass": os.getenv("EMAIL_PASS"),
     }
 
     response = requests.post(url, json=payload)
