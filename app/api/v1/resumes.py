@@ -1,17 +1,20 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form
-from sqlalchemy.orm import Session
 from typing import List
-from app.db.database import get_db
-from app.db import crud
-from app.models.resume import ResumeCreate, ResumeRead
-from app.utils.file_handler import extract_text_from_pdf, extract_text_from_docx
 
+from app.db import crud
+from app.db.database import get_db
+from app.models.resume import ResumeCreate, ResumeRead
+from app.services.llm_client import call_llm
+from app.utils.file_handler import extract_text_from_docx, extract_text_from_pdf
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from sqlalchemy.orm import Session
 
 router = APIRouter()
+
 
 @router.post("/", response_model=ResumeRead)
 def create_resume(resume_in: ResumeCreate, db: Session = Depends(get_db)):
     return crud.create_resume(db, resume_in)
+
 
 @router.get("/user/{user_id}", response_model=List[ResumeRead])
 def get_resumes_for_user(user_id: int, db: Session = Depends(get_db)):
@@ -37,20 +40,42 @@ async def upload_resume_file(
     try:
         if filename.endswith(".pdf"):
             from io import BytesIO
+
             raw_text = extract_text_from_pdf(BytesIO(contents))
         else:  # .docx
             from io import BytesIO
+
             raw_text = extract_text_from_docx(BytesIO(contents))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to extract text: {e}")
 
     if not raw_text.strip():
-        raise HTTPException(status_code=400, detail="Could not extract any text from file")
+        raise HTTPException(
+            status_code=400, detail="Could not extract any text from file"
+        )
 
     # Save in DB using existing CRUD
+    prompt = f"""
+Summarize this resume for employee referral generation.
+
+Use concise bullet points covering:
+- Education
+- Experience
+- Skills
+- Projects
+- Achievements
+
+Maximum 150 words.
+Do not invent information.
+
+Resume:
+{raw_text}
+"""
+
+    summary = call_llm(prompt)
     resume_in = ResumeCreate(
         user_id=user_id,
         title=title if title else file.filename,
-        raw_text=raw_text,
+        raw_text=summary,
     )
     return crud.create_resume(db, resume_in)

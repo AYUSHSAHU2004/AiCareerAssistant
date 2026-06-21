@@ -1,13 +1,9 @@
-from typing import List, Dict, Any
-from sqlalchemy.orm import Session
+from typing import Any, Dict, List
 
 from app.db import models
-from app.services.resume_embeddings import search_jobs_for_resume_text
-from app.services.referral_email_agent import (
-    generate_referral_email,
-    extract_subject_body,
-)
 from app.services.email_sender import queue_email
+from app.services.resume_embeddings import search_jobs_for_resume_text
+from sqlalchemy.orm import Session
 
 
 def find_employee_for_company(
@@ -60,16 +56,35 @@ def send_top3_referral_emails_for_user(
             )
             continue
 
-        # 4) generate email text with LLM
-        email_text = generate_referral_email(
-            candidate_resume=raw_text,
-            job_title=job_title,
-            job_description=job_description,
-            employee_name=employee.employee_name,
-            company_name=company_name,
-        )
+        # # 4) generate email text with LLM
+        # email_text = generate_referral_email(
+        #     candidate_resume=raw_text,
+        #     job_title=job_title,
+        #     job_description=job_description,
+        #     employee_name=employee.employee_name,
+        #     company_name=company_name,
+        # )
 
-        subject, body = extract_subject_body(email_text)
+        # subject, body = extract_subject_body(email_text)
+
+        subject = f"Referral Request for {job_title} - Job ID: {job_id}"
+
+        body = f"""Hi {employee.employee_name},
+
+        I hope you're doing well.
+
+        I recently came across the {job_title} position at {company_name} (Job ID: {job_id}) and found it to be a great match for my profile.
+
+        Here is a brief summary of my background:
+
+        {raw_text}
+
+        If you think my profile is a good fit, I would be grateful if you could consider referring me for this opportunity.
+
+        Thank you for your time and consideration.
+
+        Best regards,
+        """
 
         # 5) queue email via your Node /api/email
         api_response = queue_email(
