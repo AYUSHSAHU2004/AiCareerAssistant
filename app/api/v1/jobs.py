@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends,HTTPException
-from sqlalchemy.orm import Session
 from typing import List
-from app.db.database import get_db
-from app.db import crud,models
-from app.models.job_source import JobSourceCreate, JobSourceRead
-from app.services.scraping_service import scrape_job_source_url
 
+from app.db import crud, models
+from app.db.database import get_db
+from app.models.job_source import JobSourceRead
+from app.services.scraping_service import scrape_job_source_url
+from app.services.sync_jobs import sync_all_sources
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -16,12 +17,14 @@ router = APIRouter()
 #     """
 #     return crud.create_job_source(db, source_in)
 
+
 @router.get("/sources", response_model=List[JobSourceRead])
 def get_job_sources(db: Session = Depends(get_db)):
     """
     List all stored job source URLs.
     """
     return crud.list_job_sources(db)
+
 
 @router.post("/sources/{source_id}/scrape_test")
 def scrape_job_source(
@@ -40,7 +43,18 @@ def scrape_job_source(
 
     return {
         "source_id": source.id,
-        "url": source.base_url,   # mapping here
+        "url": source.base_url,  # mapping here
         "snippet_count": len(snippets),
         "snippets": snippets,
     }
+
+
+@router.post("/sync")
+def sync_all_job_sources(
+    db: Session = Depends(get_db),
+):
+    try:
+        sync_all_sources(db)
+        return {"message": "Job sources synchronized successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Sync failed: {str(e)}")

@@ -1,12 +1,10 @@
-from typing import List, Optional
 import os
-
-from sqlalchemy.orm import Session
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_core.documents import Document
+from typing import List, Optional
 
 from app.db import models
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
+from sqlalchemy.orm import Session
 
 # Directory where the FAISS index will be stored (folder, not single file)
 _INDEX_DIR = "job_faiss_index"
@@ -20,8 +18,6 @@ _embeddings = HuggingFaceEmbeddings(
 
 # In-memory cache of the loaded store
 _STORE: Optional[FAISS] = None
-
-
 
 
 def rebuild_vector_store(db: Session) -> None:
@@ -45,7 +41,7 @@ def rebuild_vector_store(db: Session) -> None:
         texts.append(content)
         metadatas.append(
             {
-                "job_id": job.id,
+                "external_job_id": job.external_job_id,
                 "title": job.title,
                 "company": job.company,
                 "location": job.location,
@@ -68,15 +64,14 @@ def rebuild_vector_store(db: Session) -> None:
     print(f"Indexed {len(texts)} jobs into directory '{_INDEX_DIR}'")
 
 
-
 def load_vector_store() -> FAISS:
     """
     Load the FAISS index from disk (job_faiss_index directory),
     caching it in memory for reuse.
     """
     global _STORE
-    if _STORE is not None:
-        return _STORE
+    # if _STORE is not None:
+    #     return _STORE
 
     if not os.path.exists(_INDEX_DIR):
         raise FileNotFoundError(f"Vector store directory '{_INDEX_DIR}' not found.")

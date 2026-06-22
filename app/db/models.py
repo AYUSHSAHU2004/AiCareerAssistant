@@ -1,7 +1,18 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey,Boolean,JSON,UniqueConstraint
-from sqlalchemy.orm import relationship
 from datetime import datetime
+
 from app.db.database import Base
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 
@@ -14,6 +25,42 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     resumes = relationship("Resume", back_populates="user")
+    email_credentials = relationship(
+        "UserEmailCredential",
+        back_populates="user",
+        uselist=False,
+    )
+
+
+class UserEmailCredential(Base):
+    __tablename__ = "user_email_credentials"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+
+    email = Column(String, nullable=False)
+
+    encrypted_app_password = Column(Text, nullable=False)
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    user = relationship("User", back_populates="email_credentials")
+
 
 class Resume(Base):
     __tablename__ = "resumes"
@@ -25,6 +72,7 @@ class Resume(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="resumes")
+
 
 class JobSource(Base):
     __tablename__ = "job_sources"
@@ -47,12 +95,15 @@ class JobSource(Base):
 
     jobs = relationship("Job", back_populates="source")
 
+
 class Job(Base):
     __tablename__ = "jobs"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    source_id = Column(Integer, ForeignKey("job_sources.id", ondelete="CASCADE"), nullable=False)
+    source_id = Column(
+        Integer, ForeignKey("job_sources.id", ondelete="CASCADE"), nullable=False
+    )
     external_job_id = Column(Text, nullable=False)
 
     title = Column(Text, nullable=False)
@@ -80,6 +131,7 @@ class Job(Base):
 
 class EmployeeReferralTarget(Base):
     """Stores employee contacts for referral requests."""
+
     __tablename__ = "employee_referral_targets"
 
     id = Column(Integer, primary_key=True, index=True)

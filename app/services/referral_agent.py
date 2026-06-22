@@ -32,24 +32,25 @@ def send_top3_referral_emails_for_user(
     raw_text = resume.raw_text
 
     # 2) top 3 related jobs from vector store
-    docs = search_jobs_for_resume_text(raw_text, k=3)
+    docs = search_jobs_for_resume_text(raw_text, k=5)
     if not docs:
         return []
 
     results: List[Dict[str, Any]] = []
 
     for d in docs:
+        print(d.metadata)
         company_name = d.metadata.get("company", "")
         job_title = d.metadata.get("title", "")
         job_description = d.page_content
-        job_id = d.metadata.get("job_id")
+        external_job_id = d.metadata.get("external_job_id")
 
         # 3) find employee email for this company
         employee = find_employee_for_company(db, company_name)
         if not employee:
             results.append(
                 {
-                    "job_id": job_id,
+                    "external_job_id": external_job_id,
                     "company": company_name,
                     "status": "no_employee_for_company",
                 }
@@ -67,13 +68,13 @@ def send_top3_referral_emails_for_user(
 
         # subject, body = extract_subject_body(email_text)
 
-        subject = f"Referral Request for {job_title} - Job ID: {job_id}"
+        subject = f"Referral Request for {job_title} - Job ID: {external_job_id}"
 
         body = f"""Hi {employee.employee_name},
 
         I hope you're doing well.
 
-        I recently came across the {job_title} position at {company_name} (Job ID: {job_id}) and found it to be a great match for my profile.
+        I recently came across the {job_title} position at {company_name} (Job ID: {external_job_id}) and found it to be a great match for my profile.
 
         Here is a brief summary of my background:
 
@@ -95,7 +96,7 @@ def send_top3_referral_emails_for_user(
 
         results.append(
             {
-                "job_id": job_id,
+                "external_job_id": external_job_id,
                 "company": company_name,
                 "employee_email": employee.employee_email,
                 "status": "queued",
