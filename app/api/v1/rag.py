@@ -1,11 +1,12 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 from typing import List
 
 from app.services.faiss_loader import load_vector_store
 from app.services.llm_client import call_llm
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter()
+
 
 class QueryRequest(BaseModel):
     user_id: int
@@ -29,7 +30,7 @@ async def query_rag(request: QueryRequest):
 
         retriever = vs.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": 2},  # small per context
+            search_kwargs={"k": 8},  # small per context
         )
 
         docs = retriever.invoke(request.question)
@@ -59,14 +60,8 @@ Answer:
     answer = call_llm(prompt)
 
     sources = [
-        {
-            "content": doc.page_content[:300],
-            "metadata": doc.metadata
-        }
+        {"content": doc.page_content[:300], "metadata": doc.metadata}
         for doc in all_docs
     ]
 
-    return {
-        "answer": answer,
-        "sources": sources
-    }
+    return {"answer": answer, "sources": sources}

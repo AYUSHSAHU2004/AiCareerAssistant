@@ -1,18 +1,18 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from typing import Optional
-import os
 
-from app.services.load_youtube_documents import load_youtube_documents
-from app.services.load_wikipedia_documents import load_wikipedia_documents
-from app.services.load_pdf_documents import load_pdf_documents
 from app.services.build_vector_store import build_vector_store
+from app.services.load_pdf_documents import load_pdf_documents
+from app.services.load_wikipedia_documents import load_wikipedia_documents
+from app.services.load_youtube_documents import load_youtube_documents
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 router = APIRouter()
+
 
 @router.post("/upload")
 async def upload_context(
     user_id: int = Form(...),
-    context_id: str = Form(...),   # ✅ user provides this
+    context_id: str = Form(...),  # ✅ user provides this
     youtube_url: Optional[str] = Form(None),
     wiki_query: Optional[str] = Form(None),
     pdf: Optional[UploadFile] = File(None),
@@ -37,15 +37,7 @@ async def upload_context(
 
     faiss_path = f"vectorstore/{user_id}/{context_id}"
 
-    # prevent overwrite
-    if os.path.exists(faiss_path):
-        raise HTTPException(status_code=400, detail="Context already exists")
-
     # build + save FAISS
     build_vector_store(all_docs, save_path=faiss_path)
 
-    return {
-        "context_id": context_id,
-        "faiss_path": faiss_path,
-        "context":all_docs 
-    }
+    return {"context_id": context_id, "faiss_path": faiss_path, "context": all_docs}
