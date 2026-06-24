@@ -2,6 +2,7 @@ from typing import List
 
 from app.services.faiss_loader import load_vector_store
 from app.services.llm_client import call_llm
+from app.services.reranker import rerank_documents
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -30,7 +31,7 @@ async def query_rag(request: QueryRequest):
 
         retriever = vs.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": 8},  # small per context
+            search_kwargs={"k": 12},  # small per context
         )
 
         docs = retriever.invoke(request.question)
@@ -38,6 +39,12 @@ async def query_rag(request: QueryRequest):
 
     if not all_docs:
         raise HTTPException(status_code=400, detail="No relevant documents found")
+
+    all_docs = rerank_documents(
+        request.question,
+        all_docs,
+        top_k=5,
+    )
 
     # merge context
     context_text = "\n\n".join(doc.page_content for doc in all_docs)
