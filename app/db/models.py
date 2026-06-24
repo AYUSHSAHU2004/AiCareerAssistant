@@ -62,6 +62,26 @@ class UserEmailCredential(Base):
     user = relationship("User", back_populates="email_credentials")
 
 
+class SentReferral(Base):
+    __tablename__ = "sent_referrals"
+
+    id = Column(Integer, primary_key=True)
+
+    user_id = Column(Integer, nullable=False)
+
+    external_job_id = Column(Text, nullable=False)
+
+    employee_email = Column(Text, nullable=False)
+
+    sent_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "external_job_id", "employee_email", name="uq_sent_referral"
+        ),
+    )
+
+
 class Resume(Base):
     __tablename__ = "resumes"
 

@@ -1,8 +1,10 @@
 from typing import Any, Dict, List
 
 from app.db import models
+from app.db.crud_email_credential import get_email_credential_by_user_id
 from app.services.email_sender import queue_email
 from app.services.resume_embeddings import search_jobs_for_resume_text
+from app.utils.crypto import decrypt
 from sqlalchemy.orm import Session
 
 
@@ -88,11 +90,42 @@ def send_top3_referral_emails_for_user(
         """
 
         # 5) queue email via your Node /api/email
+        credential = get_email_credential_by_user_id(db, user_id)
+        if credential is None:
+            raise ValueError("Email credentials not configured for this user.")
+        sender_email = credential.email
+        sender_password = decrypt(credential.encrypted_app_password)
+
+        already_sent = (
+            db.query(models.SentReferral)
+            .filter(
+                models.SentReferral.user_id == user_id,
+                models.SentReferral.external_job_id == external_job_id,
+                models.SentReferral.employee_email == employee.employee_email,
+            )
+            .first()
+        )
+
+        if already_sent:
+            continue
+
         api_response = queue_email(
+            sender_email=sender_email,
+            sender_password=sender_password,
             to=employee.employee_email,
             subject=subject,
             text=body,
         )
+
+        if api_response and api_response.get("message") == "Email queued for sending":
+            db.add(
+                models.SentReferral(
+                    user_id=user_id,
+                    external_job_id=external_job_id,
+                    employee_email=employee.employee_email,
+                )
+            )
+            db.commit()
 
         results.append(
             {

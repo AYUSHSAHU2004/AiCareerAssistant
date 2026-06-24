@@ -1,5 +1,6 @@
 from app.db import models
 from app.models.email_credential import EmailCredentialCreate
+from app.utils.crypto import encrypt
 from sqlalchemy.orm import Session
 
 
@@ -15,7 +16,7 @@ def create_or_update_email_credential(
 
     if existing:
         existing.email = credential.email
-        existing.encrypted_app_password = credential.app_password
+        existing.encrypted_app_password = encrypt(credential.app_password)
 
         db.commit()
         db.refresh(existing)
@@ -24,7 +25,7 @@ def create_or_update_email_credential(
     new_credential = models.UserEmailCredential(
         user_id=credential.user_id,
         email=credential.email,
-        encrypted_app_password=credential.app_password,
+        encrypted_app_password=encrypt(credential.app_password),
     )
 
     db.add(new_credential)
