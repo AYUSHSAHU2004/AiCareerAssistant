@@ -69,8 +69,6 @@
 
 * **Relevant job opportunities are identified based on the user's profile, and referral requests are sent for the matched positions**
   
-       ![frontend](./assets/es.png)
-
 ---
 
 # 4.)RAG Knowledge Base
