@@ -15,7 +15,7 @@
 | **Containers** | Docker |
 | **Back Ground Processing** | Redis Bull Mq|
 | **OCR** | EasyOcr|
-| **LLM model** | Gemini 3.5 pro|
+| **LLM model** | Gemini 2.5 flash|
 
 ---
 # 🚀 Key Features & Architecture
