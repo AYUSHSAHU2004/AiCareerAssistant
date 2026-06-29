@@ -4,6 +4,7 @@ from app.services.build_vector_store import build_vector_store
 from app.services.load_pdf_documents import load_pdf_documents
 from app.services.load_wikipedia_documents import load_wikipedia_documents
 from app.services.load_youtube_documents import load_youtube_documents
+from app.services.ocr_loader import load_words_from_imagebasedpdf as ocr_loader
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 router = APIRouter()
@@ -30,8 +31,17 @@ async def upload_context(
         all_docs.extend(load_wikipedia_documents(wiki_query))
 
     if pdf:
-        all_docs.extend(load_pdf_documents(pdf))
+        pdf_docs = load_pdf_documents(pdf)
 
+        # Check if PyPDF extracted meaningful text
+        total_text = " ".join([doc.page_content for doc in pdf_docs]).strip()
+
+        if len(total_text) < 100:  # threshold — too little text means scanned PDF
+            print("[PIPELINE] PyPDF got little/no text, falling back to OCR...")
+            all_docs.extend(ocr_loader(pdf))
+        else:
+            print("[PIPELINE] PyPDF extraction good, skipping OCR")
+            all_docs.extend(pdf_docs)
     if not all_docs:
         raise HTTPException(status_code=400, detail="Provide at least one source")
 

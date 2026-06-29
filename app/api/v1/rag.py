@@ -31,7 +31,7 @@ async def query_rag(request: QueryRequest):
 
         retriever = vs.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": 12},  # small per context
+            search_kwargs={"k": 10},  # small per context
         )
 
         docs = retriever.invoke(request.question)
