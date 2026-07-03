@@ -13,7 +13,7 @@ _INDEX_DIR = "job_faiss_index"
 _embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
     model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": False},
+    encode_kwargs={"normalize_embeddings": True},
 )
 
 # In-memory cache of the loaded store
