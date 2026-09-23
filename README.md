@@ -8,7 +8,7 @@
 | **Backend Frameworks** | Fast Api, Node.js |
 | **Ai FrameWork** | LangChain|
 | **Browser Automation Tool** | PlayWright|
-| **Database** | Postgresql,MongoDb|
+| **Database** |MongoDb|
 | **Vector Database** | FAISS|
 | **Embedding Model** |  sentence-transformers/all-MiniLM-L6-v2|
 | **Cross Encoder** | cross-encoder/ms-marco-MiniLM-L-6-v2|
